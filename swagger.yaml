@@ -1,0 +1,288 @@
+definitions:
+  dto.AuthorizeRequest:
+    properties:
+      apiIDS:
+        items:
+          type: string
+        type: array
+      menuIDS:
+        items:
+          type: string
+        type: array
+      roleID:
+        type: string
+    type: object
+  dto.UpdateAuthorizeRequest:
+    properties:
+      keys:
+        items:
+          type: string
+        type: array
+      roleID:
+        type: string
+    required:
+    - keys
+    - roleID
+    type: object
+  models.MenuSingle:
+    properties:
+      breadcrumb:
+        type: boolean
+      createdAt:
+        description: CreatedAt create time
+        type: string
+      id:
+        description: ID primary key
+        type: string
+      ignore:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+      parentId:
+        type: string
+      select:
+        type: boolean
+      title:
+        type: string
+      updatedAt:
+        description: UpdatedAt update time
+        type: string
+    type: object
+  models.User:
+    properties:
+      accountId:
+        type: string
+      avatar:
+        type: string
+      createdAt:
+        description: CreatedAt create time
+        type: string
+      email:
+        type: string
+      id:
+        description: ID primary key
+        type: string
+      introduction:
+        type: string
+      job:
+        type: string
+      jobName:
+        type: string
+      location:
+        type: string
+      locationName:
+        type: string
+      name:
+        type: string
+      organization:
+        type: string
+      organizationName:
+        type: string
+      password:
+        type: string
+      permissions:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      personalWebsite:
+        type: string
+      phoneNumber:
+        type: string
+      registrationTime:
+        type: string
+      roleId:
+        type: string
+      status:
+        type: integer
+      updatedAt:
+        description: UpdatedAt update time
+        type: string
+      username:
+        type: string
+      verified:
+        type: boolean
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
+      host:
+        type: string
+      showType:
+        type: integer
+      status:
+        type: string
+      success:
+        type: boolean
+      traceId:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: admin接口文档
+  title: admin API
+  version: 0.0.1
+paths:
+  /admin/api/menu/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 获取菜单权限
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code": 200, "data": [...]}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    allOf:
+                    - $ref: '#/definitions/models.MenuSingle'
+                    - properties:
+                        children:
+                          items:
+                            $ref: '#/definitions/models.MenuSingle'
+                          type: array
+                      type: object
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取菜单权限
+      tags:
+      - menu
+    put:
+      consumes:
+      - application/json
+      description: 更新菜单权限
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAuthorizeRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 更新菜单权限
+      tags:
+      - menu
+  /admin/api/menu/tree:
+    get:
+      description: 获取菜单树
+      responses:
+        "200":
+          description: '{"code": 200, "data": [...]}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    allOf:
+                    - $ref: '#/definitions/models.MenuSingle'
+                    - properties:
+                        children:
+                          items:
+                            $ref: '#/definitions/models.MenuSingle'
+                          type: array
+                      type: object
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取菜单树
+      tags:
+      - menu
+  /admin/api/model/migrate/{id}:
+    get:
+      description: 迁移虚拟模型
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 迁移虚拟模型
+      tags:
+      - model
+  /admin/api/role/authorize:
+    post:
+      description: 给角色授权
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AuthorizeRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 角色授权
+      tags:
+      - role
+  /admin/api/user/userInfo:
+    get:
+      consumes:
+      - application/json
+      description: 获取登录用户信息
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code": 200, "data": [...]}'
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取登录用户信息
+      tags:
+      - user
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
